@@ -17,10 +17,16 @@ st.set_page_config(
 
 # Sidebar
 st.sidebar.title("Poryecto final Bootcamp de Ciencia de Datos")
-
+st.sidebar.markdown(
+    """
+    Puedes utilizar el selector de esta barra para cambiar en tiempo real
+    los valores a utilizar de uno o más meses.
+    >**Nota:** El dataset contiene datos del segundo semestre del año 2010
+    """
+)
 
 # Intro section
-st.title("Exploración de datos de créditos Bancarios en su proceso de cobranza en el año 2010 - segundo semestre.")
+st.title("Exploración de datos de créditos Bancarios en su proceso de cobranza en el año 2010.")
 st.write(
     """
      Bienvenid@, este es mi proyecto final del bootcamp de ciencia de datos en código facilito. Primeramente agradecer a la empresa SCORE que me proporciono datos reales de su operación, datos que nos servirán para el desarrollo y análisis de los mismos.
@@ -101,5 +107,58 @@ st.markdown(
     - Ausente
     El que utilizaré para este análisis es el IdCodResultado=49,`el Id 49 pertenece a Promesa de pago`.
 
+    Para poder filtrar los datos a visualizar por mes, le agregamos la columna `Mes` al dataset original
+
+    ```python
+    # Crear columna de mes para poder filtrar la informacion
+    data['Fecha'] = pd.to_datetime(data['Fecha'])
+    data.insert(0,'Mes', (data['Fecha'].dt.month).astype(int) )
+
+    # Creacion de list para el selector
+    list_meses = data['Mes'].unique()
+    list_meses.sort()
+
+    mes = st.sidebar.multiselect('Seleccione el Mes', list_meses, list_meses[0])
+
+    # dataframe filtrado 
+    data_filter = data[
+        (data['Mes'].isin(mes))
+    ]
+
+    Lo ponemos en la primer columna para visualizar el cambio de seleccion
+    ```
     """
 )
+# Crear columna de mes para poder filtrar la informacion
+data['Fecha'] = pd.to_datetime(data['Fecha'])
+data.insert(0,'Mes', (data['Fecha'].dt.month).astype(int) )
+
+# Creacion de list para el selector
+list_meses = data['Mes'].unique()
+list_meses.sort()
+
+mes = st.sidebar.multiselect('Seleccione el Mes', list_meses, list_meses[0])
+
+# dataframe filtrado 
+data_filter = data[
+    (data['Mes'].isin(mes))
+]
+
+st.write(data_filter)
+
+# Imputación de datos
+st.header("Imputación de datos")
+st.markdown(
+    """
+    Dadas las reglas de negocio que están implementadas en el software que se utiliza
+    para el proceso de cobranza, las columnas que utilizaremos no contienen valores nulos o vacios.
+
+    **Regla de registro de gestion:** Una gestión siempre deberá tener fecha y un resultado.
+    """    
+)
+
+
+# Gráficas Containner principal
+with st.container():
+    # Titulo
+    st.title('Promesas de pago por mes')
