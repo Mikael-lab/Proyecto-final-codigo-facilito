@@ -1,7 +1,10 @@
 # Importacion de librerias
 import streamlit as st
 import pandas as pd
-import plotly.express as px
+import altair as alt
+
+from funpymodeling.exploratory import status
+
 
 # Set page config
 st.set_page_config(
@@ -161,4 +164,131 @@ st.markdown(
 # Gráficas Containner principal
 with st.container():
     # Titulo
-    st.title('Promesas de pago por mes')
+    st.title('Visualización de datos')
+    st.markdown(
+        """
+        Para poder grágicar las `promesas de pago` por mes vamos a crear un nuevo dataframe que solo contenga la fecha y el resultado.
+        """
+    )
+
+df_fecha_codResultado = data_filter[['Fecha','IdCodResultado']]
+
+st.write(df_fecha_codResultado)
+
+st.markdown(
+    """
+    Despues hacemos un crosstab para agruparlo por mes, en donde las columnas pasan a ser los IdCodResultado
+    """
+)
+
+
+df_fecha_codResultado.Fecha = pd.to_datetime(df_fecha_codResultado.Fecha,dayfirst=True)
+df_fecha_codResultado.IdCodResultado = df_fecha_codResultado['IdCodResultado'].astype('string')
+
+# Filtramos para solo tener las promesas de pago
+df_promesas = df_fecha_codResultado[df_fecha_codResultado.IdCodResultado.isin(['49'])]
+
+
+
+if df_promesas.empty == False:
+
+    df_promesas_group = pd.crosstab(df_promesas.Fecha, df_promesas.IdCodResultado).resample("M").sum().reset_index()
+
+    st.write(df_promesas_group)
+    c = alt.Chart(df_promesas_group).mark_bar(size=90).encode(
+        y= alt.Y("49", title="Promesas"),
+        x= alt.X("Fecha", title = "",timeUnit='month'),
+        color = alt.Color("49", title = "Volumen", scale = alt.Scale( scheme = "blues")),
+        tooltip=[alt.Tooltip('49',title='Promesas')]
+    ).interactive().properties(
+        title="Promesas de pago en el segundo semestre del año 2010"
+    )
+    st.altair_chart(c, use_container_width=True)
+else:
+    st.markdown(
+        """
+        >**El mes o meses seleccionados no contiene promesas de pago para gráficar**
+        """
+        )
+
+st.markdown(
+    """
+    Con el trabajo que hemos realizado hasta este punto ya pudimos identificar el `mes en el que se registraron más promesas de pago`, que fue `Agosto con un total de 5,402`.
+
+    El paso siguiente es saber el volumen de gestiones totales en comparacion con la cantidad de promesas de pago
+    """
+)
+
+# Obtenemos los totales por mes de todos los codigos de resultado
+
+df_totales = pd.crosstab(df_fecha_codResultado.Fecha,df_fecha_codResultado.IdCodResultado,dropna=True).resample("M").sum().reset_index()
+df_totales.loc['total_gestiones', :] = df_totales.sum(numeric_only=True)
+df_totales['total_gestiones'] = df_totales.sum(axis=1, numeric_only=True)
+
+df_totales_filter = df_totales[['Fecha','total_gestiones']].query('total_gestiones > 0')
+st.write(df_totales_filter)
+
+
+# Creamos los objetos para graficar
+scale = alt.Scale(domain=["Promesas","Gestiones"], range=['red','lightblue'])
+
+if df_promesas.empty == False:
+    base = alt.Chart(df_totales).transform_calculate(
+        line="'Promesas'",
+        bar="'Gestiones'"
+    ).encode(
+        alt.X("Fecha",title="",timeUnit='month'),
+    ).properties(
+        title="Volumen de gestiones y cantidad de promesas conseguidas"
+    )
+
+    bar = base.mark_bar().encode(
+        alt.Y('total_gestiones',title="Gestiones"),
+        tooltip=[alt.Tooltip("total_gestiones", title='Gestiones')],
+        color=alt.Color('bar:N', scale=scale, title=''),
+    )
+
+    line = base.mark_line(point=alt.OverlayMarkDef(color="red")).encode(
+        alt.Y("49",title=""),
+        tooltip=[alt.Tooltip('49',title='Promesas')],
+        color=alt.Color('line:N', scale=scale, title='')
+    )
+
+    text_line = line.mark_text(
+        align='right',
+        baseline='bottom',
+        dx=3
+    ).encode( 
+        text='49'
+    )
+
+    c = bar+(line+text_line).interactive()
+
+    st.altair_chart(c,use_container_width=True)
+
+    st.markdown(
+        """
+        Con la siguiente gráfica podemos observar lo siguiente:
+
+        El volumen de gestiones es abismalmente superior a la cantidad de promesas de pago generadas en cada mes.
+
+        El volumen de gestiones no siempre es proporcional a la cantidad de promesas de pago obtenidas. En el mes de Septiembre se obtuvieron un total de 3,952 promesas de pago con un `volumen de gestiones de 217,595`, en el mes de `Octubre se obtuvieron 4,296 con un volumen de 192,522`.
+
+        ## Conclusiones ##
+        En este punto ya podemos contestar las preguntas que planteamos al principio.
+
+        1. ¿Que cantidad de Gestiones se realizan en periodos de 1 mes?
+
+        1. ¿Que cantidad de promesas de pago se consiguieron en periodos de 1 mes? 
+        >**R= se puede visualizar en la gráfica "Volumen de gestiones y cantidad de promesas conseguidas"**
+
+        1. ¿Hay relación entre el volumen de Gestiones y la cantidad de promesas de pago? 
+        >**R= con los datos que se tienen hasta el momento no se observa una relación que nos indique que a mayor volumen de gestiones mayor cantidad de promesas de pago se van a obtener, claro que esto es forma general.**
+        """
+        )
+else:
+    st.markdown(
+        """
+        >**El mes o meses seleccionados no contiene promesas de pago para gráficar**
+        """
+        )
