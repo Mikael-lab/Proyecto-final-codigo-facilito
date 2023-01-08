@@ -24,7 +24,8 @@ st.sidebar.markdown(
     """
     Puedes utilizar el selector de esta barra para cambiar en tiempo real
     los valores a utilizar de uno o más meses.
-    >**Nota:** El dataset contiene datos del segundo semestre del año 2010
+    >**Nota:** El dataset contiene datos del segundo semestre del año 2010.
+    Para una mejor visualización inicial se recomienda seleccionar todos los meses que vienen en el selector.
     """
 )
 
@@ -96,7 +97,7 @@ Al desplegar los datos deberías ver una tabla como la siguiente:
 st.dataframe(data)
 st.markdown(
     """
-    Podemos ver que nuestros datos tiene en total `10 columnas y 1,028,398 registros de gestiones`.
+    Podemos ver que nuestros datos tiene en total `10 columnas y 1,028,390 registros de gestiones`.
 
     Para este análisis solamente utilizaremos los campos: `Fecha, IdCodResultado`.
 
