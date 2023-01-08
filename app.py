@@ -3,9 +3,6 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 
-from funpymodeling.exploratory import status
-
-
 # Set page config
 st.set_page_config(
     page_title='Proyecto Final', # Titulo de la pagina
