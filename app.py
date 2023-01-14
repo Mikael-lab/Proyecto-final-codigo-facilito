@@ -571,6 +571,7 @@ st.markdown(
     """
 )
 
+df_variacion['variacion'] = df_variacion['diferencia']/df_variacion['sum_promesas'].shift(1)*100
 st.write(df_variacion)
 
 st.markdown(
