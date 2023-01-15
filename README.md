@@ -9,4 +9,4 @@ Archivos del repositorio:
 1. Notebook de colab el cual pueden abrir, para cargar los datos pueden subir el archivo de datos a su sesión de colab. 
 1. Código para ejecución en StreamLit: Puedes acceder desde el link que se encuentra en la parte superior derecha
 
-Importante: Los datos son propiedad de la empresa SCORE, otorgados a Miguel Angel Angel Velazquez Mosco, autor de este proyecto con fines educativos.
+Importante: Los datos son propiedad de la empresa SCORE, otorgados a Miguel Ángel Velazquez Mosco, autor de este proyecto con fines educativos.
