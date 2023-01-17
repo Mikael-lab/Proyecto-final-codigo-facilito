@@ -511,7 +511,7 @@ st.markdown(
     1. ¿Que cantidad de gestiones recibe en promedio una cuenta?
     **R= rango de 2 a 7 en el semestre**
     1. ¿En periodos de 1 mes se llega a gestionar todas las cuentas?
-    **R= Únicamente en el mes de Agosto se gestionaron todas las cuentas**
+    **R= No, la campaña de cobranza no llega a todo el universo de cuentas**
 
     Para complementar las respuestas a las interrogantes se deben mencionar escenarios que pasan en la operacion de la agencia de cobranza, que son los siguientes:
 
